@@ -29,8 +29,12 @@ Documentation can be found [HERE](https://afocommunity.github.io/ECO-RCON/module
 
 ```ts
 // Example Usage that bans all players with a given word or phrase in their name.
-import { ECO } from '@afocommunity/eco-rcon';
+import { ECO } from '@eco.js/rcon';
 
 const myServer = new ECO('127.0.0.1', 8000, 'mypassword');
+
+await myServer.onReady;
+
+const response = await myServer.send('kick snow_e,You have been kicked');
 
 ```
