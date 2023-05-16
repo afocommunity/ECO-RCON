@@ -10,13 +10,13 @@
 NPM
 
 ```bash
-npm install @afocommunity/eco-rcon
+npm install @eco.js/rcon
 ```
 
 YARN
 
 ```bash
-yarn add @afocommunity/eco-rcon
+yarn add @eco.js/rcon
 ```
 
 # Documentation
