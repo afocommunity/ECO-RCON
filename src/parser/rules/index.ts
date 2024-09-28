@@ -1,5 +1,3 @@
-import PlayersOnline from './PlayersOnline';
+import PlayersOnline from "./PlayersOnline";
 
-export default [
-  PlayersOnline
-];
+export default [PlayersOnline];

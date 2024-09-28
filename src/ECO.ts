@@ -1,12 +1,13 @@
-import EventEmitter from 'events';
-import { Socket, createConnection } from 'node:net';
-import events from 'events';
-import RCONParser from './parser/RCONParser';
+import EventEmitter from "events";
+import { Socket, createConnection } from "node:net";
+import events from "events";
+import RCONParser from "./parser/RCONParser";
 
 enum PacketType {
   COMMAND = 0x02,
   AUTH = 0x03,
   RESPONSE_VALUE = 0x00,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   RESPONSE_AUTH = 0x02,
 }
 
@@ -15,7 +16,7 @@ type RconResponse = {
   id: number;
   type: number;
   body: string;
-}
+};
 
 /**!
  * node-rcon
@@ -40,29 +41,37 @@ class Rcon extends EventEmitter {
   }
 
   _sendSocket(buf: Buffer): void {
-    this._tcpSocket.write(buf.toString('binary'), 'binary');
+    this._tcpSocket.write(buf.toString("binary"), "binary");
   }
   connect(): void {
     try {
       this._tcpSocket = createConnection(this.port, this.host);
-      this._tcpSocket
-        .on('data', ((data: Buffer): void => {
+      this._tcpSocket.on(
+        "data",
+        ((data: Buffer): void => {
           this._tcpSocketOnData(data);
-        }).bind(this));
-      this._tcpSocket
-        .on('connect', ((): void => {
+        }).bind(this)
+      );
+      this._tcpSocket.on(
+        "connect",
+        ((): void => {
           this.socketOnConnect();
-        }).bind(this));
-      this._tcpSocket
-        .on('error', ((err: Error): void => {
-          this.emit('error', err);
-        }).bind(this));
-      this._tcpSocket
-        .on('end', ((): void => {
+        }).bind(this)
+      );
+      this._tcpSocket.on(
+        "error",
+        ((err: Error): void => {
+          this.emit("error", err);
+        }).bind(this)
+      );
+      this._tcpSocket.on(
+        "end",
+        ((): void => {
           this.socketOnEnd();
-        }).bind(this));
+        }).bind(this)
+      );
     } catch (error) {
-      this.emit('error', error)
+      this.emit("error", error);
     }
   }
   send(data: string, cmd: number, id = 0x0012d4a6) {
@@ -82,10 +91,13 @@ class Rcon extends EventEmitter {
   }
   setTimeout(timeout: number, callback: () => unknown): void {
     if (!this._tcpSocket) return;
-    this._tcpSocket.setTimeout(timeout, ((): void => {
-      this._tcpSocket.end();
-      if (callback) callback();
-    }).bind(this));
+    this._tcpSocket.setTimeout(
+      timeout,
+      ((): void => {
+        this._tcpSocket.end();
+        if (callback) callback();
+      }).bind(this)
+    );
   }
   _tcpSocketOnData(data: Buffer): boolean | void {
     if (this.outstandingData != null) {
@@ -109,17 +121,18 @@ class Rcon extends EventEmitter {
       }
       const id: number = data.readInt32LE(4);
       const type: number = data.readInt32LE(8);
-      if (id == -1) return this.emit('error', new Error('Authentication failed'));
+      if (id == -1)
+        return this.emit("error", new Error("Authentication failed"));
 
       if (!this.hasAuthed && type == PacketType.RESPONSE_AUTH) {
         this.hasAuthed = true;
-        this.emit('auth');
+        this.emit("auth");
       } else if (type == PacketType.RESPONSE_VALUE) {
         // Read just the body of the packet (truncate the last null byte)
         // See https://developer.valvesoftware.com/wiki/Source_RCON_Protocol for details
-        let str: string = data.toString('utf8', 12, 12 + bodyLen);
+        let str: string = data.toString("utf8", 12, 12 + bodyLen);
 
-        if (str.charAt(str.length - 1) === '\n') {
+        if (str.charAt(str.length - 1) === "\n") {
           // Emit the response without the newline.
           str = str.substring(0, str.length - 1);
         }
@@ -130,7 +143,7 @@ class Rcon extends EventEmitter {
           type: data.readInt32LE(8),
           body: str,
         };
-        this.emit('response', response);
+        this.emit("response", response);
       }
 
       data = data.subarray(packetLen);
@@ -140,13 +153,12 @@ class Rcon extends EventEmitter {
     this.outstandingData = data;
   }
 
-
   socketOnConnect(): void {
-    this.emit('connect');
+    this.emit("connect");
     this.send(this.password, PacketType.AUTH);
   }
   socketOnEnd(): void {
-    this.emit('end');
+    this.emit("end");
     this.hasAuthed = false;
   }
 }
@@ -158,11 +170,11 @@ type ResponsePromiseQueueObject = {
   resolve: (data: unknown) => void;
   reject: (reason: unknown) => void;
   timeOut: NodeJS.Timeout;
-}
+};
 
 type ECOOptions = {
-  disableAutoStatus: boolean
-}
+  disableAutoStatus: boolean;
+};
 
 /**
  * Primary Interface Object for ECO servers.
@@ -177,28 +189,61 @@ export default class ECO {
   protected _conn!: Rcon;
   protected _isAuthorized!: boolean;
   protected _responsePromiseQueue!: Map<number, ResponsePromiseQueueObject>;
-  public debug = false
+  public debug = false;
   /**Reconnect to the client */
-  public reconnect!: () => Promise<unknown>
-  public _events!: EventEmitter
-  constructor(ip: string, port: number, password: string, options?: ECOOptions) {
-    Object.defineProperty(this, '_isAuthorized', { enumerable: false, value: false });
-    Object.defineProperty(this, 'messageID', { enumerable: false, value: 1 });
-    Object.defineProperty(this, '_events', { enumerable: false, value: new EventEmitter });
-    Object.defineProperty(this, '_responsePromiseQueue', { enumerable: false, value: new Map });
-    Object.defineProperty(this, 'rconParser', { enumerable: false, value: new RCONParser(this) });
-    Object.defineProperty(this, '_onResponse', { enumerable: false, value: this._onResponse.bind(this) });
-    Object.defineProperty(this, '_onError', { enumerable: false, value: this._onError.bind(this) });
-    Object.defineProperty(this, '_onEnd', { enumerable: false, value: this.onEnd.bind(this) });
-    Object.defineProperty(this, '_conn', { enumerable: false, value: new Rcon(ip, port, password) });
-    const executor = (res: (val: null) => void, rej: (val: unknown) => void) => {
+  public reconnect!: () => Promise<unknown>;
+  public _events!: EventEmitter;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(
+    ip: string,
+    port: number,
+    password: string,
+    _options?: ECOOptions
+  ) {
+    Object.defineProperty(this, "_isAuthorized", {
+      enumerable: false,
+      value: false,
+    });
+    Object.defineProperty(this, "messageID", { enumerable: false, value: 1 });
+    Object.defineProperty(this, "_events", {
+      enumerable: false,
+      value: new EventEmitter(),
+    });
+    Object.defineProperty(this, "_responsePromiseQueue", {
+      enumerable: false,
+      value: new Map(),
+    });
+    Object.defineProperty(this, "rconParser", {
+      enumerable: false,
+      value: new RCONParser(this),
+    });
+    Object.defineProperty(this, "_onResponse", {
+      enumerable: false,
+      value: this._onResponse.bind(this),
+    });
+    Object.defineProperty(this, "_onError", {
+      enumerable: false,
+      value: this._onError.bind(this),
+    });
+    Object.defineProperty(this, "_onEnd", {
+      enumerable: false,
+      value: this.onEnd.bind(this),
+    });
+    Object.defineProperty(this, "_conn", {
+      enumerable: false,
+      value: new Rcon(ip, port, password),
+    });
+    const executor = (
+      res: (val: null) => void,
+      rej: (val: unknown) => void
+    ) => {
       let handled = false;
-      this._conn.once('error', (err) => {
+      this._conn.once("error", (err) => {
         if (handled) return;
         handled = true;
         rej(err);
       });
-      this._conn.once('auth', (): void => {
+      this._conn.once("auth", (): void => {
         if (handled) return;
         handled = true;
         res(null);
@@ -206,34 +251,48 @@ export default class ECO {
       this._conn.connect();
     };
     this._conn
-      .on('response', this._onResponse)
-      .on('error', this._onError)
-      .on('end', this.onEnd);
+      .on("response", this._onResponse)
+      .on("error", this._onError)
+      .on("end", this.onEnd);
 
-    Object.defineProperty(this, 'onReady', { enumerable: false, value: new Promise<null>(executor) });
-    Object.defineProperty(this, 'reconnect', {
-      enumerable: false, value: () => {
-        Object.defineProperty(this, 'onReady', { enumerable: false, value: new Promise<null>(executor) });
-        return this.onReady
-      }
+    Object.defineProperty(this, "onReady", {
+      enumerable: false,
+      value: new Promise<null>(executor),
     });
-    this.onReady.then(() => {
-      this._events.emit('READY')
-    })
-      .catch((err) => {
-        this._events.emit('error', err)
+    Object.defineProperty(this, "reconnect", {
+      enumerable: false,
+      value: () => {
+        Object.defineProperty(this, "onReady", {
+          enumerable: false,
+          value: new Promise<null>(executor),
+        });
+        return this.onReady;
+      },
+    });
+    this.onReady
+      .then(() => {
+        this._events.emit("READY");
       })
-    this._events.on('error', ()=>{
+      .catch((err) => {
+        this._events.emit("error", err);
+      });
+    this._events.on("error", () => {
       //Handle Error. Hookable
-    })
+    });
   }
 
-  public on(event: 'READY', cb: () => void): EventEmitter
-  public on(event: Parameters<EventEmitter['on']>[0], cb: Parameters<EventEmitter['on']>[1]): EventEmitter {
+  public on(event: "READY", cb: () => void): EventEmitter;
+  public on(
+    event: Parameters<EventEmitter["on"]>[0],
+    cb: Parameters<EventEmitter["on"]>[1]
+  ): EventEmitter {
     return this._events.on(event, cb);
   }
 
-  public removeListener(event: Parameters<EventEmitter['removeListener']>[0], cb: Parameters<EventEmitter['removeListener']>[1]): EventEmitter {
+  public removeListener(
+    event: Parameters<EventEmitter["removeListener"]>[0],
+    cb: Parameters<EventEmitter["removeListener"]>[1]
+  ): EventEmitter {
     return this._events.removeListener(event, cb);
   }
 
@@ -246,7 +305,7 @@ export default class ECO {
     return new Promise((resolve, reject) => {
       const ob: ResponsePromiseQueueObject = {
         time: new Date(),
-        buffer: '',
+        buffer: "",
         handled: false,
       } as ResponsePromiseQueueObject;
       ob.resolve = (dat: unknown): void => {
@@ -271,7 +330,9 @@ export default class ECO {
   protected _onResponse(response: RconResponse): void {
     const size: number = response?.size;
     if (this._responsePromiseQueue.has(response.id)) {
-      const q: ResponsePromiseQueueObject = this._responsePromiseQueue.get(response.id) as ResponsePromiseQueueObject;
+      const q: ResponsePromiseQueueObject = this._responsePromiseQueue.get(
+        response.id
+      ) as ResponsePromiseQueueObject;
       if (size >= 4092) {
         //MAX PACKET SIZE, MIGHT BE SPLIT
         q.buffer += response.body;
@@ -279,7 +340,7 @@ export default class ECO {
       }
       //eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: any =
-        this._parseResponse((q.buffer ?? '') + response.body) ?? response;
+        this._parseResponse((q.buffer ?? "") + response.body) ?? response;
       if (res.success === false) {
         q.reject(res.data);
       } else {
@@ -298,13 +359,13 @@ export default class ECO {
     this._conn.disconnect();
   }
   protected _parseResponse(res: string): unknown {
-    const data: string = res?.replaceAll('\\r\\n', '\n');
-    if (data == null || data?.trim?.() == '') return null;
+    const data: string = res?.replaceAll("\\r\\n", "\n");
+    if (data == null || data?.trim?.() == "") return null;
     return this.rconParser.parse(data);
   }
   protected _onError(err: string): void {
     if (this.debug) {
-      console.error(err)
+      console.error(err);
     }
     //Handle Error. Hookable
   }
