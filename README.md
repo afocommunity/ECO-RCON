@@ -5,6 +5,8 @@
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/afocommunity/eco-rcon) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/afocommunity/eco-rcon)
 
+[Our Discord](https://discord.gg/uzeWjVTPSQ)
+
 # Installation
 
 NPM
@@ -23,7 +25,7 @@ yarn add @eco.js/rcon
 
 Documentation can be found [HERE](https://afocommunity.github.io/ECO-RCON/modules.html)
 
-![Docs](https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=online&url=https%3A%2F%2Fafocommunity.github.io%2FOHD-RCON%2Fmodules.html)
+![Docs](https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=online&url=https://ecojs.github.io/Rcon/%2Fmodules.html)
 
 # Usage
 
