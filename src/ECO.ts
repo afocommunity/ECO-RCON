@@ -50,25 +50,25 @@ class Rcon extends EventEmitter {
         "data",
         ((data: Buffer): void => {
           this._tcpSocketOnData(data);
-        }).bind(this)
+        }).bind(this),
       );
       this._tcpSocket.on(
         "connect",
         ((): void => {
           this.socketOnConnect();
-        }).bind(this)
+        }).bind(this),
       );
       this._tcpSocket.on(
         "error",
         ((err: Error): void => {
           this.emit("error", err);
-        }).bind(this)
+        }).bind(this),
       );
       this._tcpSocket.on(
         "end",
         ((): void => {
           this.socketOnEnd();
-        }).bind(this)
+        }).bind(this),
       );
     } catch (error) {
       this.emit("error", error);
@@ -96,14 +96,14 @@ class Rcon extends EventEmitter {
       ((): void => {
         this._tcpSocket.end();
         if (callback) callback();
-      }).bind(this)
+      }).bind(this),
     );
   }
   _tcpSocketOnData(data: Buffer): boolean | void {
     if (this.outstandingData != null) {
       data = Buffer.concat(
         [this.outstandingData, data],
-        this.outstandingData.length + data.length
+        this.outstandingData.length + data.length,
       );
       this.outstandingData = null;
     }
@@ -193,12 +193,12 @@ export default class ECO {
   /**Reconnect to the client */
   public reconnect!: () => Promise<unknown>;
   public _events!: EventEmitter;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(
     ip: string,
     port: number,
     password: string,
-    _options?: ECOOptions
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options?: ECOOptions,
   ) {
     Object.defineProperty(this, "_isAuthorized", {
       enumerable: false,
@@ -235,7 +235,7 @@ export default class ECO {
     });
     const executor = (
       res: (val: null) => void,
-      rej: (val: unknown) => void
+      rej: (val: unknown) => void,
     ) => {
       let handled = false;
       this._conn.once("error", (err) => {
@@ -284,14 +284,14 @@ export default class ECO {
   public on(event: "READY", cb: () => void): EventEmitter;
   public on(
     event: Parameters<EventEmitter["on"]>[0],
-    cb: Parameters<EventEmitter["on"]>[1]
+    cb: Parameters<EventEmitter["on"]>[1],
   ): EventEmitter {
     return this._events.on(event, cb);
   }
 
   public removeListener(
     event: Parameters<EventEmitter["removeListener"]>[0],
-    cb: Parameters<EventEmitter["removeListener"]>[1]
+    cb: Parameters<EventEmitter["removeListener"]>[1],
   ): EventEmitter {
     return this._events.removeListener(event, cb);
   }
@@ -331,7 +331,7 @@ export default class ECO {
     const size: number = response?.size;
     if (this._responsePromiseQueue.has(response.id)) {
       const q: ResponsePromiseQueueObject = this._responsePromiseQueue.get(
-        response.id
+        response.id,
       ) as ResponsePromiseQueueObject;
       if (size >= 4092) {
         //MAX PACKET SIZE, MIGHT BE SPLIT
