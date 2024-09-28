@@ -1,9 +1,9 @@
 
 # ECO RCON Interface
 
-![npm](https://img.shields.io/npm/dw/@afocommunity/eco-rcon) ![GitHub Sponsors](https://img.shields.io/github/sponsors/bombitmanbomb) [![GitHub issues](https://img.shields.io/github/issues/afocommunity/eco-rcon)](https://github.com/afocommunity/ECO-RCON/issues) ![GitHub](https://img.shields.io/badge/license-MIT-brightgreen) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@afocommunity/eco-rcon) [![Codacy grade](https://img.shields.io/codacy/grade/bc777618c71e42fb87caae1c0c970327?logo=codacy)](https://www.codacy.com/gh/afocommunity/ECO-RCON/dashboard?utm_source=github.com&utm_medium=referral&utm_content=afocommunity/ECO-RCON&utm_campaign=Badge_Grade) ![GitHub](https://img.shields.io/badge/node->=16.0.0-brightgreen) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/afocommunity/eco-rcon)
+![npm](https://img.shields.io/npm/dw/@eco.js/rcon) ![GitHub Sponsors](https://img.shields.io/github/sponsors/bombitmanbomb) [![GitHub issues](https://img.shields.io/github/issues/Ecojs/Rcon)](https://github.com/Ecojs/Rcon/issues) ![GitHub](https://img.shields.io/badge/license-MIT-brightgreen) ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@eco.js/rcon) [![Codacy grade](https://img.shields.io/codacy/grade/bc777618c71e42fb87caae1c0c970327?logo=codacy)](https://www.codacy.com/gh/Ecojs/Rcon/dashboard?utm_source=github.com&utm_medium=referral&utm_content=Ecojs/Rcon&utm_campaign=Badge_Grade) ![GitHub](https://img.shields.io/badge/node->=16.0.0-brightgreen) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Ecojs/Rcon)
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/afocommunity/eco-rcon) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/afocommunity/eco-rcon)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/Ecojs/Rcon) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/Ecojs/Rcon)
 
 [Our Discord](https://discord.gg/uzeWjVTPSQ)
 
@@ -23,7 +23,7 @@ yarn add @eco.js/rcon
 
 # Documentation
 
-Documentation can be found [HERE](https://afocommunity.github.io/ECO-RCON/modules.html)
+Documentation can be found [HERE](https://ecojs.github.io/Rcon/modules.html)
 
 ![Docs](https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=online&url=https://ecojs.github.io/Rcon/%2Fmodules.html)
 
