@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
-import { Socket } from 'net';
+import { Socket, createConnection } from 'node:net';
 import events from 'events';
-import net from 'net';
 import RCONParser from './parser/RCONParser';
 
 enum PacketType {
@@ -45,7 +44,7 @@ class Rcon extends EventEmitter {
   }
   connect(): void {
     try {
-      this._tcpSocket = net.createConnection(this.port, this.host);
+      this._tcpSocket = createConnection(this.port, this.host);
       this._tcpSocket
         .on('data', ((data: Buffer): void => {
           this._tcpSocketOnData(data);
